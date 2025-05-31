@@ -26,9 +26,8 @@ export default [
     ...prefix("profile", [
       route(":id", "./routes/profile/profile.$id.tsx"),
       route("settings", "./routes/profile/profile.settings.tsx"),
-
-    ])
-  ])
+    ]),
+  ]),
 
   ...prefix("api", [route("auth/*", "./routes/api/better.tsx")]),
 ] satisfies RouteConfig;
