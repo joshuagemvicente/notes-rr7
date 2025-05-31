@@ -1,17 +1,37 @@
 import { prisma } from "~/lib/prisma";
 import type { LoaderFunctionArgs } from "react-router";
-import { data, redirect,  Link, useLoaderData  } from "react-router";
+import { data, redirect, Link, useLoaderData } from "react-router";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { Button } from "~/components/ui/button";
 import { auth } from "~/lib/auth.server";
 import type { Note } from "@prisma/client";
-
-dayjs.extend(relativeTime);
+import { formatDate } from "~/utils/formatDate";
+import { Avatar, AvatarFallback } from "~/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuContent,
+} from "~/components/ui/dropdown-menu";
+import { signOut } from "~/lib/auth.client";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const session = await auth.api.getSession({
     headers: request.headers,
+  });
+  const userId = session?.user?.id;
+
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+    },
   });
 
   if (!session) {
@@ -24,36 +44,47 @@ export async function loader({ request }: LoaderFunctionArgs) {
     },
   });
 
-  return data({ notes });
-}
-
-function formatDate(date: Date) {
-  const now = dayjs();
-  const noteDate = dayjs(date);
-
-  if (noteDate.isSame(now, "day")) {
-    return "Today";
-  } else if (noteDate.isSame(now.subtract(1, "day"), "day")) {
-    return "Yesterday";
-  } else if (noteDate.isAfter(now.subtract(7, "day"))) {
-    return noteDate.fromNow();
-  } else {
-    return noteDate.format("MMM D, YYYY");
-  }
+  return data({ notes, user });
 }
 
 export default function NotesPage() {
-  const { notes } = useLoaderData<typeof loader>();
+  const { notes, user } = useLoaderData<typeof loader>();
+  console.log("userData", user);
 
   return (
     <div className="max-w-4xl mx-auto p-4">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">My Notes</h1>
-        <Link to="/notes/new">
-          <Button className="bg-black text-white hover:bg-gray-800">
-            New Note
-          </Button>
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link to="/notes/new">
+            <Button className="bg-black text-white hover:bg-gray-800">
+              New Note
+            </Button>
+          </Link>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Avatar>
+                <AvatarFallback className="bg-gray-200 text-gray-800">
+                  {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
+                </AvatarFallback>
+              </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuLabel className="text-sm font-semibold">
+                {user?.name || "User"}
+              </DropdownMenuLabel>
+              <DropdownMenuItem>
+                <Link to="/profile">Profile</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link to="/settings">Settings</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => signOut()}>
+                <button>Logout</button>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
       <div className="grid gap-4">
