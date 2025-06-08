@@ -92,9 +92,9 @@ export default function NotesPage() {
               <DropdownMenuLabel className="text-sm font-semibold">
                 {user?.name || "User"}
               </DropdownMenuLabel>
-              <DropdownMenuItem>
-                <Link to="/profile">Profile</Link>
-              </DropdownMenuItem>
+              <Link to="/profile">
+                <DropdownMenuItem>Profile</DropdownMenuItem>
+              </Link>
               <DropdownMenuItem>
                 <Link to="/settings">Settings</Link>
               </DropdownMenuItem>

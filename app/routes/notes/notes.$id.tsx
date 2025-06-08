@@ -23,13 +23,17 @@ import {
   DialogDescription,
   DialogFooter,
 } from "~/components/ui/dialog";
-import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "~/components/ui/tooltip";
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
   const noteId = params.id;
-  const note = await prisma.note.findUnique({ 
+  const note = await prisma.note.findUnique({
     where: { id: noteId },
-    include: { User: true }
+    include: { User: true },
   });
 
   if (!note) {
@@ -75,7 +79,7 @@ export default function EditNotePage() {
 
   if (!isAuthor) {
     return (
-      <div className="max-w-4xl mx-auto p-4">
+      <div className="max-w-4xl mx-auto p-4 h-screen">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-bold text-ellipsis overflow-hidden whitespace-nowrap">
             <Tooltip>
@@ -391,8 +395,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
   });
 
   const userId = session?.user?.id;
-  const note = await prisma.note.findUnique({ 
-    where: { id: params.id } 
+  const note = await prisma.note.findUnique({
+    where: { id: params.id },
   });
 
   if (note?.userId !== userId) {
