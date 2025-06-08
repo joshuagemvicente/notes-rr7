@@ -19,6 +19,8 @@ model Note {
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  User      User?    @relation(fields: [userId], references: [id])
+  userId    String?
 }
 
 model User {
@@ -29,6 +31,7 @@ model User {
   image         String?
   createdAt     DateTime
   updatedAt     DateTime
+  notes         Note[]
   sessions      Session[]
   accounts      Account[]
 
@@ -82,10 +85,10 @@ model Verification {
 }
 
 model RateLimit {
-  id           String   @id @default(cuid())
-  key          String
-  count        Int      @default(0)
-  lastRequest  DateTime
-  windowStart  DateTime
-  resetTime    DateTime
+  id          String   @id @default(cuid())
+  key         String
+  count       Int      @default(0)
+  lastRequest DateTime
+  windowStart DateTime
+  resetTime   DateTime
 }

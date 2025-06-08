@@ -24,7 +24,7 @@ export default [
 
   layout("./routes/profile/profile-layout.tsx", [
     ...prefix("profile", [
-      route(":id", "./routes/profile/profile.$id.tsx"),
+      index("./routes/profile/profile.tsx"),
       route("settings", "./routes/profile/profile.settings.tsx"),
     ]),
   ]),
